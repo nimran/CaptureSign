@@ -18,48 +18,44 @@
 @end
 
 @implementation ViewController
-@synthesize signatureModal_View,captureSign_Button;
+@synthesize digitalSign_ImageView;
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor lightGrayColor]];
-    
-    
-    signatureModal_View = [[SignatureModalView alloc]initWithFrame:CGRectMake(0,10,self.view.frame.size.width,300)];
-    [self.view addSubview:signatureModal_View];
-    NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:SIGN_PATH];
-    NSMutableArray *signPathArray = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    [signatureModal_View setPathArray:signPathArray];
-    [signatureModal_View setNeedsDisplay];
-    
-    captureSign_Button = [[UIButton alloc]initWithFrame:CGRectMake((self.view.frame.size.width/2)-100, self.view.frame.size.height-100, 200,80)];
-    [captureSign_Button setTitle:@"Save Sign" forState:UIControlStateNormal];
-    [captureSign_Button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.view addSubview:captureSign_Button];
-    [captureSign_Button addTarget:self action:@selector(captureSignButtonAction) forControlEvents:UIControlEventTouchUpInside];
-    
-    
-    
+    NSLog(@"test controller");
     // Do any additional setup after loading the view, typically from a nib.
 }
--(void)captureSignButtonAction{
-    [signatureModal_View captureSign];
-    UIImage *captureImage = [signatureModal_View signImage];
-    NSData *pngData = UIImagePNGRepresentation(captureImage);
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsPath = [paths objectAtIndex:0]; //Get the docs directory
-    NSString *filePath = [documentsPath stringByAppendingPathComponent:@"image.png"];
-    NSLog(@"path is %@ and image size is %f ,%f",filePath,captureImage.size.width,captureImage.size.height);
-    //Add the file name
-    [pngData writeToFile:filePath atomically:YES];
-    [signatureModal_View erase];
-    UIStoryboard *myStoryBoard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
-    DisplaySignViewController *catogery = [myStoryBoard instantiateViewControllerWithIdentifier:@"displaySign"];
-    catogery.cropped_Image = captureImage;
-    [self.navigationController pushViewController:catogery animated:NO];
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    DisplaySignViewController *newVC = segue.destinationViewController;
+    newVC.delegate = self;
+    [ViewController setPresentationStyleForSelfController:self presentingController:newVC];
+}
+
++ (void)setPresentationStyleForSelfController:(UIViewController *)selfController presentingController:(UIViewController *)presentingController
+{
+    if ([NSProcessInfo instancesRespondToSelector:@selector(isOperatingSystemAtLeastVersion:)])
+    {
+        //iOS 8.0 and above
+        presentingController.providesPresentationContextTransitionStyle = YES;
+        presentingController.definesPresentationContext = YES;
+        
+        [presentingController setModalPresentationStyle:UIModalPresentationOverCurrentContext];
+    }
+    else
+    {
+        [selfController setModalPresentationStyle:UIModalPresentationCurrentContext];
+        [selfController.navigationController setModalPresentationStyle:UIModalPresentationCurrentContext];
+    }
+}
+-(void)recieveSign:(NSData *)data withImage:(UIImage*)image{
+    //here you reviece the image and data
+    [digitalSign_ImageView setImage:image];
+    [digitalSign_ImageView setContentMode:UIViewContentModeScaleAspectFit];
     
     
 }
-
 
 
 - (void)didReceiveMemoryWarning {

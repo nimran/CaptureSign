@@ -7,9 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SignatureModalView.h"
+
+@protocol recieveSignDelegate <NSObject>
+-(void)recieveSign:(NSData *)data withImage:(UIImage*)image;
+
+@end
+
+
+
+
 
 @interface DisplaySignViewController : UIViewController{
     UIImageView *sign_ImageView;
+    UIButton *captureSign_Button,*close_Button;
 }
-@property(strong,nonatomic )UIImage *cropped_Image;
+@property(nonatomic,weak)id <recieveSignDelegate> delegate;
+@property (weak, nonatomic) IBOutlet UIView *dialog_View;
+@property(strong,nonatomic)SignatureModalView *signatureModal_View;
+
 @end

@@ -7,12 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SignatureModalView.h"
-@interface ViewController : UIViewController{
+#import "DisplaySignViewController.h"
+
+
+@interface ViewController : UIViewController<recieveSignDelegate>{
+      UIView *popUp_View;
     
 }
-@property(strong,nonatomic)SignatureModalView *signatureModal_View;
-@property(strong,nonatomic)UIButton *captureSign_Button;
+@property (weak, nonatomic) IBOutlet UIImageView *digitalSign_ImageView;
+
 
 @end
 
